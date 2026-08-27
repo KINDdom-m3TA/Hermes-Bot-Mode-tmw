@@ -9,10 +9,18 @@ function parsePort(value: string | undefined): number {
   return parsed;
 }
 
+function expandHome(value: string): string {
+  if (value === '~') return os.homedir();
+  if (value.startsWith('~/')) return path.join(os.homedir(), value.slice(2));
+  return value;
+}
+
+const configuredRoot = process.env.M3TA_ROOT ?? path.join(os.homedir(), 'MetaHu3manOS');
+
 export const config = Object.freeze({
   host: '127.0.0.1',
   port: parsePort(process.env.M3TA_MCP_PORT),
-  root: path.resolve(process.env.M3TA_ROOT ?? path.join(os.homedir(), 'MetaHu3manOS')),
+  root: path.resolve(expandHome(configuredRoot)),
   omlxBaseUrl: (process.env.M3TA_OMLX_BASE_URL ?? 'http://127.0.0.1:8000/v1').replace(/\/$/, ''),
   enableAuditWrite: process.env.M3TA_ENABLE_AUDIT_WRITE === '1',
   maxReadBytes: 256 * 1024,
