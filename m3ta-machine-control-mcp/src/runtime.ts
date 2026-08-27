@@ -51,7 +51,6 @@ export function machineInfo(): Record<string, unknown> {
 }
 
 export async function processList(): Promise<string> {
-  // Use comm rather than full command arguments so tokens embedded in process args are never exposed.
   return run('ps', ['-axo', 'pid=,ppid=,comm=']);
 }
 
@@ -100,7 +99,7 @@ export async function gitHead(): Promise<Record<string, string>> {
   return { branch, commit };
 }
 
-export async function gitDiff(options: { staged?: boolean; path?: string }): Promise<string> {
+export async function gitDiff(options: { staged?: boolean; path?: string | undefined }): Promise<string> {
   const args = ['-C', config.root, 'diff', '--no-ext-diff', '--no-color'];
   if (options.staged) args.push('--cached');
   if (options.path) {
@@ -115,7 +114,8 @@ export async function serviceStatus(label: string): Promise<string> {
     throw new Error('Service label contains unsupported characters');
   }
   if (process.platform === 'darwin') {
-    return run('launchctl', ['print', `gui/${process.getuid?.() ?? 0}/${label}`]);
+    const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+    return run('launchctl', ['print', `gui/${uid}/${label}`]);
   }
   return run('systemctl', ['--user', 'status', '--no-pager', label]);
 }
@@ -156,10 +156,10 @@ export async function modelList(): Promise<Record<string, unknown>> {
   if (!response.ok) {
     throw new Error(`oMLX model endpoint returned HTTP ${response.status}`);
   }
-  const body = await response.text();
+  const body = await response.json() as unknown;
   return {
     endpoint: `${config.omlxBaseUrl}/models`,
-    response: JSON.parse(safeOutput(body, config.maxCommandBytes)) as unknown
+    response: body
   };
 }
 
