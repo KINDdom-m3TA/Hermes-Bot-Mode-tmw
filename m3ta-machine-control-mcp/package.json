@@ -1,0 +1,26 @@
+{
+  "name": "@kingdom-uv-m3ta/m3ta-machine-control-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Permissioned machine-control MCP and WebMCP bridge for MetaHuman OS.",
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "npm run build && node --test dist/**/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^6.0.0"
+  }
+}
